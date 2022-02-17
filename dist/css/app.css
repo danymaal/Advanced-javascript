@@ -18,4 +18,8 @@ body {
 .btn {
   border: none;
 }
+
+.first {
+  display: none;
+}
 /*# sourceMappingURL=app.css.map */
