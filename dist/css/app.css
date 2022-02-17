@@ -10,4 +10,12 @@ body {
   margin: 0 auto;
   text-align: center;
 }
+
+.pencil {
+  color: #fff;
+}
+
+.btn {
+  border: none;
+}
 /*# sourceMappingURL=app.css.map */

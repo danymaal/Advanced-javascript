@@ -162,3 +162,33 @@ const text1 = new TextBox({
 const text2 = new TextBox({
   selector: '.text2',
 });
+
+class NewParagraph {
+  constructor(selector) {
+    this.$el = document.querySelector(selector);
+  }
+
+  addParagraph(text) {
+    this.$el.textContent = text;
+  }
+}
+
+class NewP extends NewParagraph {
+  constructor(options) {
+    super(options.selector);
+  }
+}
+
+// const newParag = new NewP ({
+//     selector: '.pencil'
+// })
+
+const button = document.querySelector('.btn');
+const newParag = new NewP({
+  selector: '.pencil',
+});
+
+button.addEventListener('click', () => {
+  newParag.addParagraph('Clicked');
+});
+
