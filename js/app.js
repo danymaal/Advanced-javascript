@@ -1,43 +1,98 @@
 'use strict';
 
-function createCalcFuntction(n) {
-  return function () {
-    console.log(1000 * n);
-  };
-}
+console.log('Request data...');
 
-// По сути это просто функция внутри другой функции
-const calc = createCalcFuntction(42);
-// Функиця createCalcFuntction() возвращает нам другую функцию, поэтому мы можем занести ее в переменную и затем вызвать
+const p = new Promise(function (resolve, reject) {
+  setTimeout(() => {
+    console.log('Preparing data...');
+    const backendData = {
+      server: 'aws',
+      port: 2000,
+      status: 'working',
+    };
+    resolve(backendData); // Вызывая функцию resolve, мы говорим нашему промису, что он завершил свое выполнение
+    // Чтобы получить доступ к backendData в методе then нужно просто передать ее в resolve
+  }, 2000);
+});
 
-// Когда мы вызывали функцию createCalcFuntction(), то она отработала и вернула нам функицию, которая внутри нее. Но учитываю что внутрення фунция была вызвана в контексте функции createCalcFuntction(), переменная, которую принимает она принимает была замкнута в той функции, которую мы возвращаем. И поэтому всегда когда мы вызываем функцию calc(), в ней уже храниться значение n. Поэтому это и называется замыкание.
+// Функция resolve вызывается тогда, когда была завершенна асинхронная операция, причем была завершенна успешно
 
-calc();
+// Сдесь параметр data = backendData
+p.then((data) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      data.modified = true;
+      resolve(data);
+      //   Также можно использовать reject, что будет значить что операция была завершена не успешно
+      //   reject(data);
+    }, 2000);
+  });
 
-function createIncrementor(n) {
-  return function (num) {
-    return n + num;
-  };
-}
+  //   p2.then((clientData) => {
+  //     console.log('Data recieved', clientData);
+  //   });
+})
+  .then((clientData) => {
+    console.log('Data recieved', clientData);
+    clientData.fromPromise = true;
+    return clientData;
+  })
+  .then((data) => {
+    console.log('Modified', data);
+  })
+  .catch((err) => {
+    console.error('Error: ', err); // Метод catch для проверки ошибок
+  })
+  .finally(() => {
+    console.log('Finally');
+  }); // Метод finally будет вызываться независимо от состояния операции
 
-const addOne = createIncrementor(1); // Допустим мы хотим замкнуть переменную n на значении 1
+// Подобная запись, как .then называеться чейнинг (чейнить)
 
-const addTen = createIncrementor(10);
+// В методе then мы указываем какие что будет происходить когда промис будет выполнен, то есть сработает resolve
 
-console.log(addOne(42));
+// Промисы лучше сеттаймаутов с колбэками тем, что у них меньше вложенность. Также можно проверять на наличие ошибок (например: сервер не ответил)
 
-console.log(addTen(40));
+const sleep = (ms) => {
+  return new Promise((resolve) =>
+    setTimeout(() => {
+      resolve();
+    }, ms),
+  );
+};
 
-function urlGenerator(domain) {
-  return function (url) {
-    return `https://${url}.${domain}`;
-  };
-}
+sleep(2000).then(() => {
+  console.log('After 2 seconds');
+});
 
-const comUrl = urlGenerator('com');
+// Promise.all сработает тогда, когда будут исполнены все промисы
+Promise.all([sleep(2000), sleep(5000)]).then(() => {
+  console.log('All promises');
+});
 
-console.log(comUrl('google'));
-console.log(comUrl('netflix'));
+// Promise.rece сработает тогда, когда выполнится первый промис в списке
+Promise.race([sleep(2000), sleep(5000)]).then(() => {
+  console.log('Race promises');
+});
 
+const prom = new Promise(function (resolve, reject) {
+  setTimeout(() => {
+    console.log('Looking for person');
 
+    const person = {
+      name: 'Margo',
+      age: 31,
+      job: 'Driver',
+    };
 
+    resolve(person);
+  }, 2000);
+});
+
+prom.then((pers) => {
+  setTimeout(() => {
+    pers.hasDog = true;
+    console.log('Person was found: ', pers);
+  }, 3500);
+});
+    
